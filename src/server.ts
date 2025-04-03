@@ -1,33 +1,22 @@
 import express from 'express'
 import cors from 'cors'
-import connectDB from './config/mongodb'
-import router from './routers/index'
-import errorHandler from './middleware/errorHandler'
-import { Server } from 'socket.io'
-import { createServer } from 'node:http'
-import SocketService from './services/socket.service'
-import SocketInstance from './services/socket.instance'
+import connectDB from '@/config/mongodb'
+import router from '@/routers/index'
+import errorHandler from '@/middleware/errorHandler'
 import bodyParser from 'body-parser'
 import dotEnv from 'dotenv'
+import 'module-alias/register'
+
 dotEnv.config()
 
 const app = express()
-const server = createServer(app)
-
-const io = new Server(server, {
-  cors: {
+app.use(
+  cors({
     origin: '*',
-    methods: ['GET', 'POST', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-  }
-})
-
+    credentials: true
+  })
+)
 const port = process.env.NODE_ENV === 'development' ? process.env.DEV_PORT || 5000 : process.env.PROD_PORT || 8080
-
-//Socket
-const socketService = new SocketService(io)
-SocketInstance.init(io)
-socketService.init()
 
 //Middleware
 app.use(cors())
@@ -46,7 +35,7 @@ app.use(router)
 app.use(errorHandler.notFoundError)
 app.use(errorHandler.globalError)
 
-server.listen(port, () => {
+app.listen(port, () => {
   console.log(`Server is running on port ${port}`)
   console.log(`http://localhost:${port}`)
 })
