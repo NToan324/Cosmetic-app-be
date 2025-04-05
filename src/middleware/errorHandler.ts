@@ -7,12 +7,15 @@ export default class ErrorHandler {
     next(new NotFoundError())
   }
 
-  static globalError(err: CustomError, req: Request, res: Response, next: NextFunction) {
-    res.status(err.status || StatusCodes.INTERNAL_SERVER_ERROR).json({
+  static globalError(err: any, req: Request, res: Response, next: NextFunction) {
+    const statusCode = err instanceof CustomError ? err.status : StatusCodes.INTERNAL_SERVER_ERROR
+    const message = err.message || 'Internal Server Error'
+
+    res.status(statusCode).json({
       success: false,
       error: {
-        message: err.message || 'Internal Server Error',
-        statusCode: err.status || StatusCodes.INTERNAL_SERVER_ERROR
+        message,
+        statusCode
       }
     })
   }

@@ -5,13 +5,8 @@ const userSchema = new Schema(
       type: String,
       required: true
     },
-    email: {
-      type: String,
-      unique: true
-    },
     password: {
-      type: String,
-      required: true
+      type: String
     },
     role: {
       type: String,
@@ -20,6 +15,7 @@ const userSchema = new Schema(
     },
     phone: {
       type: String,
+      unique: true,
       required: true
     },
     skin_type: {
