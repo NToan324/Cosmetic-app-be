@@ -15,7 +15,13 @@ const productSchema = new Schema(
     },
     stock_quantity: {
       type: Number,
-      default: 0
+      default: 0,
+      required: true
+    },
+    units: {
+      type: String,
+      enum: ['BOX', 'TUBE', 'PACK', 'PCS'],
+      required: true
     },
     category_id: {
       type: mongoose.Schema.Types.ObjectId,
@@ -29,6 +35,14 @@ const productSchema = new Schema(
     },
     image_url: {
       type: String
+    },
+    release_date: {
+      type: Date,
+      required: true,
+      default: Date.now
+    },
+    discontinued_date: {
+      type: Date
     }
   },
   { timestamps: true }

@@ -1,4 +1,29 @@
-export enum SOCKET_ACTION {
-  ADD_COMMENT = "ADD_COMMENT",
-  GET_COMMENTS = "GET_COMMENTS",
+export enum Category {
+  SKINCARE = 'SKIN_CARE',
+  MAKEUP = 'MAKE_UP',
+  HAIRCARE = 'HAIR_CARE',
+  BODYCARE = 'BODY_CARE',
+  PERSONAL_CARE = 'PERSONAL_CARE',
+  TOOLSANDBRUSHES = 'TOOLS_AND_BRUSHES'
+}
+
+export enum Role {
+  MANAGER = 'MANAGER',
+  SALESTAFF = 'SALE_STAFF',
+  CONSULTANT = 'CONSULTANT',
+  CUSTOMER = 'CUSTOMER'
+}
+
+export enum EmployeeType {
+  PARTTIME = 'PARTTIME',
+  FULLTIME = 'FULLTIME'
+}
+
+export enum Branch {}
+
+export enum Unit {
+  BOX = 'BOX',
+  TUBE = 'TUBE',
+  PACK = 'PACK',
+  PCS = 'PCS'
 }
