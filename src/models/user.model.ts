@@ -5,18 +5,29 @@ const userSchema = new Schema(
       type: String,
       required: true
     },
-    password: {
-      type: String
-    },
-    role: {
-      type: String,
-      enum: ['Admin', 'Staff', 'Customer'],
-      default: 'Customer'
-    },
     phone: {
       type: String,
       unique: true,
       required: true
+    },
+    password: {
+      type: String,
+      required: true
+    },
+    email: {
+      type: String,
+      unique: true
+    },
+    role: [
+      {
+        type: String,
+        enum: ['MANAGER', 'SALESTAFF', 'CONSULTANT', 'CUSTOMER'],
+        default: 'CUSTOMER'
+      }
+    ],
+    type: {
+      type: String,
+      enum: ['PARTTIME', 'FULLTIME']
     },
     skin_type: {
       type: String
@@ -26,6 +37,9 @@ const userSchema = new Schema(
     },
     age: {
       type: Number
+    },
+    active: {
+      type: Boolean,
     }
   },
   { timestamps: true }

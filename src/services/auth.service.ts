@@ -1,7 +1,6 @@
 import { BadRequestError } from '@/core/error.response'
 import { CreatedResponse, OkResponse } from '@/core/success.response'
 import userModel from '@/models/user.model'
-import { ObjectId } from 'mongoose'
 class AuthService {
   async signup(payload: { phone: string; name: string }) {
     const { phone, name } = payload
