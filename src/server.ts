@@ -16,7 +16,7 @@ app.use(
     credentials: true
   })
 )
-const port = process.env.NODE_ENV === 'development' ? process.env.DEV_PORT || 5000 : process.env.PROD_PORT || 8080
+const port = process.env.NODE_ENV === 'development' ? process.env.DEV_PORT || 3000 : process.env.PROD_PORT || 8080
 
 //Middleware
 app.use(cors())
