@@ -6,17 +6,6 @@ const employeeSchema = new Schema(
       required: true,
       unique: true
     },
-    email: {
-      type: String,
-      unique: true
-    },
-    role: [
-      {
-        type: String,
-        enum: ['MANAGER', 'SALESTAFF', 'CONSULTANT', 'CUSTOMER'],
-        default: 'CUSTOMER'
-      }
-    ],
     type: {
       type: String,
       enum: ['PARTTIME', 'FULLTIME']

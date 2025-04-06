@@ -6,6 +6,9 @@ const userSchema = new Schema(
       type: String,
       required: true
     },
+    email: {
+      type: String
+    },
     password: {
       type: String,
       required: true
@@ -15,6 +18,14 @@ const userSchema = new Schema(
       unique: true,
       required: true
     },
+    role: [
+      {
+        type: String,
+        enum: ['MANAGER', 'SALESTAFF', 'CONSULTANT', 'CUSTOMER'],
+        default: 'CUSTOMER',
+        required: true
+      }
+    ],
     active: {
       type: Boolean
     }
