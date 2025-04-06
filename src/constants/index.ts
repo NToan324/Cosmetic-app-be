@@ -7,6 +7,15 @@ export enum Category {
   TOOLSANDBRUSHES = 'TOOLS_AND_BRUSHES'
 }
 
+export enum Rank {
+  MEMBER = 'MEMBER',
+  BRONZE = 'BRONZE',
+  SILVER = 'SILVER',
+  GOLD = 'GOLD',
+  DIAMOND = 'DIAMOND',
+  PLATINUM = 'PLATINUM'
+}
+
 export enum Role {
   MANAGER = 'MANAGER',
   SALESTAFF = 'SALE_STAFF',
