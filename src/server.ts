@@ -5,6 +5,7 @@ import router from '@/routers/index'
 import errorHandler from '@/middleware/errorHandler'
 import bodyParser from 'body-parser'
 import dotEnv from 'dotenv'
+import cookieParser from 'cookie-parser'
 import 'module-alias/register'
 
 dotEnv.config()
@@ -25,6 +26,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use(bodyParser.json({ limit: '50mb' }))
 app.use(bodyParser.urlencoded({ extended: true }))
 
+app.use(cookieParser())
 //connect database
 connectDB()
 
