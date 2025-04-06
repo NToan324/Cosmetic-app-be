@@ -6,10 +6,6 @@ const customerSchema = new Schema(
       required: true,
       unique: true
     },
-    role: {
-      type: String,
-      default: 'CUSTOMER'
-    },
     rank: {
       type: String,
       enum: ['MEMBER', 'BRONZE', 'SILVER', 'GOLD', 'DIAMOND', 'PLATINUM']

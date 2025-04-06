@@ -3,11 +3,34 @@ import bcrypt from 'bcrypt';
 
 const userSchema = new Schema(
   {
-    name: { type: String, required: true },
-    password: { type: String, required: true },
-    phone: { type: String, unique: true, required: true },
-    email: { type: String, unique: true, required: true },
-    active: { type: Boolean, default: true },
+    name: {
+      type: String,
+      required: true
+    },
+    email: {
+      type: String
+    },
+    password: {
+      type: String,
+      required: true
+    },
+    phone: {
+      type: String,
+      unique: true,
+      required: true
+    },
+    role: [
+      {
+        type: String,
+        enum: ['MANAGER', 'SALESTAFF', 'CONSULTANT', 'CUSTOMER'],
+        default: 'CUSTOMER',
+        required: true
+      }
+    ],
+    active: {
+      type: Boolean,
+      default: true
+    }
   },
   { timestamps: true }
 );
