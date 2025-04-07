@@ -52,6 +52,7 @@ class AuthService {
     }
     const accessToken = jwt.sign(
       {
+        id: userFound._id,
         phone: userFound.phone || undefined,
         email: userFound.email || undefined,
         role: userFound.role
@@ -63,6 +64,7 @@ class AuthService {
     )
     const refreshToken = jwt.sign(
       {
+        id: userFound._id,
         phone: userFound.phone || undefined,
         email: userFound.email || undefined,
         role: userFound.role

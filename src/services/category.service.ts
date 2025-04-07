@@ -1,42 +1,36 @@
-import { OkResponse } from '@/core/success.response'; // Giả sử bạn có class này
-import categoryModel from '@/models/category.model';
+import { CreatedResponse, OkResponse } from '@/core/success.response' // Giả sử bạn có class này
+import { convertToObjectId } from '@/helpers/convertObjectId'
+import categoryModel, { Category } from '@/models/category.model'
 
 class CategoryService {
-  // Thêm danh mục
-  async createCategory(categoryData: any) {
-    const newCategory = await categoryModel.create(categoryData);
-    return new OkResponse('Category created successfully', newCategory);
+  async createCategory(payload: Category) {
+    const newCategory = await categoryModel.create(payload)
+    return new CreatedResponse('Category created successfully', newCategory)
   }
 
-  // Lấy tất cả danh mục
   async getCategories() {
-    const categories = await categoryModel.find();
-    return new OkResponse('Get all categories successfully', categories);
+    const categories = await categoryModel.find()
+    return new OkResponse('Get all categories successfully', categories)
   }
 
-  // Lấy thông tin 1 danh mục theo _id
   async getCategoryById(id: string) {
-    const category = await categoryModel.findById(id);
-    if (!category) throw new Error('Danh mục không tồn tại');
-    return new OkResponse('Get category successfully', category);
+    const category = await categoryModel.findById(id)
+    if (!category) throw new Error('Category not found')
+    return new OkResponse('Get category successfully', category)
   }
 
-  // Sửa thông tin danh mục
-  async updateCategory(id: string, updateData: any) {
-    const category = await categoryModel.findById(id);
-    if (!category) throw new Error('Danh mục không tồn tại');
-    category.set(updateData);
-    await category.save();
-    return new OkResponse('Category updated successfully', category);
+  async updateCategory({ id, payload }: { id: string; payload: Partial<Category> }) {
+    const category = await categoryModel.findByIdAndUpdate(convertToObjectId(id), payload, { new: true })
+    if (!category) throw new Error('Category not found')
+    return new OkResponse('Category updated successfully', category)
   }
 
-  // Xóa danh mục
   async deleteCategory(id: string) {
-    const category = await categoryModel.findByIdAndDelete(id);
-    if (!category) throw new Error('Danh mục không tồn tại');
-    return new OkResponse('Category deleted successfully', null);
+    const category = await categoryModel.findByIdAndDelete(id)
+    if (!category) throw new Error('Category not found')
+    return new OkResponse('Category deleted successfully', category)
   }
 }
 
-const categoryService = new CategoryService();
-export default categoryService;
+const categoryService = new CategoryService()
+export default categoryService

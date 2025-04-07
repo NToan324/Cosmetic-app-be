@@ -1,24 +1,21 @@
-import z from 'zod';
+import z from 'zod'
 
-class CategoryValidation {
-  createCategory() {
+export class CategoryValidation {
+  static createCategory() {
     return {
       body: z.object({
         name: z.string().nonempty('Tên danh mục không được để trống'),
-        description: z.string().optional(),
-      }),
-    };
+        description: z.string().optional()
+      })
+    }
   }
 
-  updateCategory() {
+  static updateCategory() {
     return {
       body: z.object({
-        name: z.string().nonempty('Tên danh mục không được để trống').optional(),
-        description: z.string().optional(),
-      }),
-    };
+        name: z.string().optional(),
+        description: z.string().optional()
+      })
+    }
   }
 }
-
-const categoryValidation = new CategoryValidation();
-export default categoryValidation;

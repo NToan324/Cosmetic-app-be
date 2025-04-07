@@ -1,15 +1,31 @@
-import express from 'express';
-import employeeController from '@/controllers/employee.controller';
-import asyncHandler from '@/middleware/asyncHandler';
-import multer from 'multer';
+import express from 'express'
+import employeeController from '@/controllers/employee.controller'
+import asyncHandler from '@/middleware/asyncHandler'
+import { EmployeeValidation } from '@/validation/employee.validation'
+import { validationRequest } from '@/middleware/validationRequest'
+import verifyJWT from '@/middleware/verifyJWT'
 
-const router = express.Router();
-const upload = multer({ storage: multer.memoryStorage() });
+const router = express.Router()
 
-router.post('/', upload.none(), asyncHandler(employeeController.createEmployee));
-router.put('/:id', upload.none(), asyncHandler(employeeController.updateEmployee));
-router.put('/:id', upload.none(), asyncHandler(employeeController.deleteEmployee));
-router.get('/:id', asyncHandler(employeeController.getEmployeeById));
-router.get('/', asyncHandler(employeeController.getAllEmployees));
+router.get('/', asyncHandler(employeeController.getAllEmployees))
+router.get('/:id', asyncHandler(employeeController.getEmployeeById))
+router.post(
+  '/',
+  verifyJWT,
+  validationRequest(EmployeeValidation.createEmployee()),
+  asyncHandler(employeeController.createEmployee)
+)
+router.patch(
+  '/:id',
+  verifyJWT,
+  validationRequest(EmployeeValidation.updateEmployee()),
+  asyncHandler(employeeController.updateEmployee)
+)
+router.patch(
+  '/:id',
+  verifyJWT,
+  validationRequest(EmployeeValidation.deleteEmployee()),
+  asyncHandler(employeeController.deleteEmployee)
+)
 
-export default router;
+export default router

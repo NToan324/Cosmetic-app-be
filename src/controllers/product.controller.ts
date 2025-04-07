@@ -1,60 +1,28 @@
-import productService from '@/services/product.service';
-import productValidation from '@/validation/product.validation';
-import type { Request, Response } from 'express';
-import { ZodError } from 'zod';
+import productService from '@/services/product.service'
+import type { Request, Response } from 'express'
 
 class ProductController {
   //Thêm sản phẩm
   async createProduct(req: Request, res: Response) {
-    try {
-      const schema = productValidation.createProduct().body;
-      const validatedData = schema.parse(req.body);
-      const newProduct = await productService.createProduct(validatedData);
-      res.status(201).json(newProduct);
-    } catch (error: any) {
-      if (error instanceof ZodError) {
-        const errorMessage = error.errors[0].message;
-        res.status(400).json({ message: errorMessage });
-      } else {
-        res.status(500).json({ message: error.message });
-      }
-    }
+    const { id } = req.user as { id: string }
+    const payload = req.body
+    res.send(await productService.createProduct({ payload, id }))
   }
 
-  //Lấy sản phẩm
   async getProducts(req: Request, res: Response) {
-    try {
-      const products = await productService.getProducts();
-      res.status(200).json(products);
-    } catch (error: any) {
-      res.status(500).json({ message: error.message });
-    }
+    res.send(await productService.getProducts())
   }
 
-  //Láy 1 sản phẩm
   async getProductById(req: Request, res: Response) {
-    try {
-      const product = await productService.getProductById(req.params.id);
-      res.status(200).json(product);
-    } catch (error: any) {
-      res.status(500).json({ message: error.message });
-    }
+    const { id } = req.params
+    res.send(await productService.getProductById(id))
   }
 
-  // Xóa sản phẩm
   async deleteProduct(req: Request, res: Response) {
-    try {
-      const product = await productService.deleteProduct(req.params.id);
-      res.status(200).json(product);
-    } catch (error: any) {
-      if (error.message.includes('đã bị xóa từ')) {
-        res.status(400).json({ message: error.message }); // 400 cho lỗi logic
-      } else {
-        res.status(404).json({ message: error.message }); // 404 cho không tìm thấy
-      }
-    }
+    const { id } = req.params
+    res.send(await productService.deleteProduct(id))
   }
 }
 
-const productController = new ProductController();
-export default productController;
+const productController = new ProductController()
+export default productController
