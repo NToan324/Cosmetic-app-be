@@ -1,22 +1,27 @@
-import categoryController from '../controllers/category.controller';
-import asyncHandler from '@/middleware/asyncHandler';
-import { Router } from 'express';
+import categoryController from '../controllers/category.controller'
+import asyncHandler from '@/middleware/asyncHandler'
+import { Router } from 'express'
+import { CategoryValidation } from '@/validation/category.validation'
+import { validationRequest } from '@/middleware/validationRequest'
 
-const router = Router();
+const router = Router()
 
-// Thêm danh mục
-router.post('/categories', asyncHandler(categoryController.createCategory));
+router.post(
+  '/',
+  validationRequest(CategoryValidation.createCategory()),
+  asyncHandler(categoryController.createCategory)
+)
 
-// Lấy tất cả danh mục
-router.get('/categories', asyncHandler(categoryController.getCategories));
+router.get('/', asyncHandler(categoryController.getCategories))
 
-// Lấy 1 danh mục theo _id
-router.get('/categories/:id', asyncHandler(categoryController.getCategoryById));
+router.get('/:id', asyncHandler(categoryController.getCategoryById))
 
-// Sửa danh mục
-router.put('/categories/:id', asyncHandler(categoryController.updateCategory));
+router.patch(
+  '/:id',
+  validationRequest(CategoryValidation.updateCategory()),
+  asyncHandler(categoryController.updateCategory)
+)
 
-// Xóa danh mục
-router.delete('/categories/:id', asyncHandler(categoryController.deleteCategory));
+router.delete('/categories/:id', asyncHandler(categoryController.deleteCategory))
 
-export default router;
+export default router

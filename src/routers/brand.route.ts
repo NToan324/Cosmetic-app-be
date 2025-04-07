@@ -1,22 +1,19 @@
-import brandController from '../controllers/brand.controller';
-import asyncHandler from '@/middleware/asyncHandler';
-import { Router } from 'express';
+import brandController from '../controllers/brand.controller'
+import asyncHandler from '@/middleware/asyncHandler'
+import { validationRequest } from '@/middleware/validationRequest'
+import { BrandValidation } from '@/validation/brand.validation'
+import { Router } from 'express'
 
-const router = Router();
+const router = Router()
 
-// Thêm thương hiệu
-router.post('/brands', asyncHandler(brandController.createBrand));
+router.post('/', validationRequest(BrandValidation.createBrand()), asyncHandler(brandController.createBrand))
 
-// Lấy tất cả thương hiệu
-router.get('/brands', asyncHandler(brandController.getBrands));
+router.get('/', asyncHandler(brandController.getBrands))
 
-// Lấy 1 thương hiệu theo _id
-router.get('/brands/:id', asyncHandler(brandController.getBrandById));
+router.get('/:id', asyncHandler(brandController.getBrandById))
 
-// Sửa thương hiệu
-router.put('/brands/:id', asyncHandler(brandController.updateBrand));
+router.put('/:id', validationRequest(BrandValidation.updateBrand()), asyncHandler(brandController.updateBrand))
 
-// Xóa thương hiệu
-router.delete('/brands/:id', asyncHandler(brandController.deleteBrand));
+router.delete('/:id', asyncHandler(brandController.deleteBrand))
 
-export default router;
+export default router
