@@ -10,7 +10,9 @@ class ProductController {
   }
 
   async getProducts(req: Request, res: Response) {
-    res.send(await productService.getProducts())
+    const { category, price } = req.query as { category: string; price: string }
+    console.log(category, price)
+    res.send(await productService.getProducts({ category, price }))
   }
 
   async getProductById(req: Request, res: Response) {

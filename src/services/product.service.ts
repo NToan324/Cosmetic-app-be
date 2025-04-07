@@ -2,6 +2,8 @@ import { CreatedResponse, OkResponse } from '@/core/success.response' // Giả s
 import productModel, { type Product } from '@/models/product.model'
 import orderModel from '@/models/order.model'
 import { convertToObjectId } from '@/helpers/convertObjectId'
+import { BadRequestError } from '@/core/error.response'
+import { console } from 'inspector'
 class ProductService {
   async createProduct(data: { payload: Product; id: string }) {
     const newProduct = await productModel.create({
@@ -11,9 +13,40 @@ class ProductService {
     return new CreatedResponse('Product created successfully', newProduct)
   }
 
-  async getProducts() {
-    const products = await productModel.find()
-    return new OkResponse('Get all products successfully', products)
+  async getProducts({ category, price }: { category?: string; price?: string }) {
+    const query: any = {}
+
+    // Lọc theo category nếu có
+    if (category) {
+      query.category_id = category
+    }
+
+    // Lọc theo price nếu có
+    if (price) {
+      if (price === 'low') {
+        // Sắp xếp giá từ thấp đến cao
+        const products = await productModel.find(query).sort({ price: 1 })
+        if (!products || products.length === 0) {
+          return new OkResponse('No products found with the specified price filter', [])
+        }
+        return new OkResponse('Get products successfully', products)
+      } else if (price === 'high') {
+        // Sắp xếp giá từ cao đến thấp
+        const products = await productModel.find(query).sort({ price: -1 })
+        if (!products || products.length === 0) {
+          return new OkResponse('No products found with the specified price filter', [])
+        }
+        return new OkResponse('Get products successfully', products)
+      }
+    }
+
+    // Nếu không có bộ lọc giá, lấy tất cả sản phẩm theo category (nếu có)
+    const products = await productModel.find(query)
+    if (!products || products.length === 0) {
+      return new OkResponse('No products found with the specified filters', [])
+    }
+
+    return new OkResponse('Get products successfully', products)
   }
 
   async getProductById(id: string) {

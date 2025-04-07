@@ -28,7 +28,7 @@ export enum EmployeeType {
   FULLTIME = 'FULLTIME'
 }
 
-export enum Branch {}
+export enum Brand {}
 
 export enum Unit {
   BOX = 'BOX',

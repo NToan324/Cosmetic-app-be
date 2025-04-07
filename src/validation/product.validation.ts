@@ -11,6 +11,10 @@ export class ProductValidation {
           name: z.string().nonempty('Tên sản phẩm không được để trống'),
           description: z.string().nonempty('Mô tả sản phẩm không được để trống'),
           price: z.number({ invalid_type_error: 'Giá phải là số' }).positive('Giá phải là số dương'),
+          discount_price: z
+            .number({ invalid_type_error: 'Giá khuyến mãi phải là số' })
+            .positive('Giá khuyến mãi phải là số dương')
+            .optional(),
           stock_quantity: z
             .number({ invalid_type_error: 'Số lượng tồn kho phải là số' })
             .int('Số lượng tồn kho phải là số nguyên')

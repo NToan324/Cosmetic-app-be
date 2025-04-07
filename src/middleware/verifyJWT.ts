@@ -12,7 +12,6 @@ declare global {
   }
 }
 const verifyJWT = (req: Request, res: Response, next: NextFunction) => {
-  console.log('req.headers', req.headers)
   const authHeader = req.headers['authorization']
   if (!authHeader) {
     return next(new UnauthorizedError('Unauthorized'))
