@@ -1,42 +1,38 @@
-import { OkResponse } from '@/core/success.response'; // Giả sử bạn có class này
-import brandModel from '@/models/brand.model';
+import { BadRequestError } from '@/core/error.response'
+import { CreatedResponse, OkResponse } from '@/core/success.response' // Giả sử bạn có class này
+import { convertToObjectId } from '@/helpers/convertObjectId'
+import brandModel from '@/models/brand.model'
+import { Brand } from '@/models/brand.model'
 
 class BrandService {
-  // Thêm thương hiệu
-  async createBrand(brandData: any) {
-    const newBrand = await brandModel.create(brandData);
-    return new OkResponse('Brand created successfully', newBrand);
+  async createBrand(payload: Brand) {
+    const newBrand = await brandModel.create(payload)
+    return new CreatedResponse('Brand created successfully', newBrand)
   }
 
-  // Lấy tất cả thương hiệu
   async getBrands() {
-    const brands = await brandModel.find();
-    return new OkResponse('Get all brands successfully', brands);
+    const brands = await brandModel.find()
+    return new OkResponse('Get all brands successfully', brands)
   }
 
-  // Lấy thông tin 1 thương hiệu theo _id
   async getBrandById(id: string) {
-    const brand = await brandModel.findById(id);
-    if (!brand) throw new Error('Thương hiệu không tồn tại');
-    return new OkResponse('Get brand successfully', brand);
+    const brand = await brandModel.findById(convertToObjectId(id))
+    if (!brand) throw new BadRequestError('Brand not found')
+    return new OkResponse('Get brand successfully', brand)
   }
 
-  // Sửa thông tin thương hiệu
-  async updateBrand(id: string, updateData: any) {
-    const brand = await brandModel.findById(id);
-    if (!brand) throw new Error('Thương hiệu không tồn tại');
-    brand.set(updateData);
-    await brand.save();
-    return new OkResponse('Brand updated successfully', brand);
+  async updateBrand({ id, payload }: { id: string; payload: Partial<Brand> }) {
+    const brand = await brandModel.findByIdAndUpdate(convertToObjectId(id), payload, { new: true })
+    if (!brand) throw new BadRequestError('Brand not found')
+    return new OkResponse('Brand updated successfully', brand)
   }
 
-  // Xóa thương hiệu
   async deleteBrand(id: string) {
-    const brand = await brandModel.findByIdAndDelete(id);
-    if (!brand) throw new Error('Thương hiệu không tồn tại');
-    return new OkResponse('Brand deleted successfully', null);
+    const brand = await brandModel.findByIdAndDelete(id)
+    if (!brand) throw new Error('Brand not found')
+    return new OkResponse('Brand deleted successfully', brand)
   }
 }
 
-const brandService = new BrandService();
-export default brandService;
+const brandService = new BrandService()
+export default brandService

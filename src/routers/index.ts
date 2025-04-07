@@ -9,7 +9,6 @@ import verifyJWT from '@/middleware/verifyJWT'
 const router = Router()
 
 router.use('/auth', authRouter)
-router.use('/user', userRouter)
 router.use('/customer', customerRouter)
 router.use('/employee', employeeRouter)
 router.use('/brand', brandRouter)
