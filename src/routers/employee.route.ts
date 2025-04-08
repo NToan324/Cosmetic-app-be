@@ -7,7 +7,7 @@ import verifyJWT from '@/middleware/verifyJWT'
 
 const router = express.Router()
 
-router.get('/', asyncHandler(employeeController.getAllEmployees))
+router.get('/', verifyJWT, asyncHandler(employeeController.getAllEmployees))
 router.get('/:id', asyncHandler(employeeController.getEmployeeById))
 router.post(
   '/',
@@ -21,11 +21,6 @@ router.patch(
   validationRequest(EmployeeValidation.updateEmployee()),
   asyncHandler(employeeController.updateEmployee)
 )
-router.patch(
-  '/:id',
-  verifyJWT,
-  validationRequest(EmployeeValidation.deleteEmployee()),
-  asyncHandler(employeeController.deleteEmployee)
-)
+router.delete('/:id', verifyJWT, asyncHandler(employeeController.deleteEmployee))
 
 export default router

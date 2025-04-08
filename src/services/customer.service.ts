@@ -12,13 +12,15 @@ class UserService {
           from: 'customers',
           localField: '_id',
           foreignField: 'userId',
-          as: 'customerDetails'
+          as: 'customer'
         }
       },
       {
+        $unwind: '$customer'
+      },
+      {
         $project: {
-          password: 0,
-          'customerDetails.userId': 0
+          password: 0
         }
       }
     ])

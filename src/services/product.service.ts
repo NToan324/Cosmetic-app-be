@@ -65,6 +65,20 @@ class ProductService {
     if (!product) throw new Error('Sản phẩm không tồn tại')
     return new OkResponse('Xóa sản phẩm thành công', product)
   }
+
+  async updateProduct({ payload, id, productId }: { payload: Product; id: string; productId: string }) {
+    const updatedProduct = await productModel.findByIdAndUpdate(
+      { _id: convertToObjectId(productId) },
+      {
+        ...payload,
+        updated_by: id
+      },
+      { new: true }
+    )
+
+    if (!updatedProduct) throw new BadRequestError('Sản phẩm không tồn tại')
+    return new OkResponse('Cập nhật sản phẩm thành công', updatedProduct)
+  }
 }
 
 const productService = new ProductService()

@@ -24,6 +24,13 @@ class ProductController {
     const { id } = req.params
     res.send(await productService.deleteProduct(id))
   }
+
+  async updateProduct(req: Request, res: Response) {
+    const { id } = req.user as { id: string }
+    const productId = req.params.id
+    const payload = req.body
+    res.send(await productService.updateProduct({ payload, id, productId }))
+  }
 }
 
 const productController = new ProductController()

@@ -7,17 +7,20 @@ import { Router } from 'express'
 
 const router = Router()
 
+router.get('/', asyncHandler(productController.getProducts))
+router.get('/:id', asyncHandler(productController.getProductById))
 router.post(
   '/',
   verifyJWT,
   validationRequest(ProductValidation.createProduct()),
   asyncHandler(productController.createProduct)
 )
-
-router.get('/', asyncHandler(productController.getProducts))
-
-router.get('/:id', asyncHandler(productController.getProductById))
-
-router.delete('/:id', asyncHandler(productController.deleteProduct))
+router.put(
+  '/:id',
+  verifyJWT,
+  validationRequest(ProductValidation.updateProduct()),
+  asyncHandler(productController.updateProduct)
+)
+router.delete('/:id', verifyJWT, asyncHandler(productController.deleteProduct))
 
 export default router

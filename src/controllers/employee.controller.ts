@@ -21,13 +21,14 @@ class EmployeeController {
     const { id } = req.user as { id: string }
     const employeeId = req.params.id
     const payload = req.body
+
     res.send(await employeeService.updateEmployee({ payload, id, employeeId }))
   }
 
   async deleteEmployee(req: Request, res: Response) {
     const { id } = req.user as { id: string }
-    const payload = req.body
-    res.send(await employeeService.deleteEmployee({ id, payload }))
+    const employeeId = req.params.id
+    res.send(await employeeService.deleteEmployee({ id, employeeId }))
   }
 }
 
