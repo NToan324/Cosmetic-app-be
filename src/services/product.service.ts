@@ -3,7 +3,6 @@ import productModel, { type Product } from '@/models/product.model'
 import orderModel from '@/models/order.model'
 import { convertToObjectId } from '@/helpers/convertObjectId'
 import { BadRequestError } from '@/core/error.response'
-import { console } from 'inspector'
 class ProductService {
   async createProduct(data: { payload: Product; id: string }) {
     const newProduct = await productModel.create({
@@ -13,45 +12,53 @@ class ProductService {
     return new CreatedResponse('Product created successfully', newProduct)
   }
 
-  async getProducts({ category, price }: { category?: string; price?: string }) {
+  async getProducts({
+    category,
+    price,
+    page = 1,
+    limit = 10
+  }: {
+    category?: string
+    price?: string
+    page?: number
+    limit?: number
+  }) {
     const query: any = {}
 
-    // Lọc theo category nếu có
     if (category) {
       query.category_id = category
     }
 
-    // Lọc theo price nếu có
-    if (price) {
-      if (price === 'low') {
-        // Sắp xếp giá từ thấp đến cao
-        const products = await productModel.find(query).sort({ price: 1 })
-        if (!products || products.length === 0) {
-          return new OkResponse('No products found with the specified price filter', [])
-        }
-        return new OkResponse('Get products successfully', products)
-      } else if (price === 'high') {
-        // Sắp xếp giá từ cao đến thấp
-        const products = await productModel.find(query).sort({ price: -1 })
-        if (!products || products.length === 0) {
-          return new OkResponse('No products found with the specified price filter', [])
-        }
-        return new OkResponse('Get products successfully', products)
-      }
+    const sort: any = {}
+    if (price === 'low') {
+      sort.price = 1
+    } else if (price === 'high') {
+      sort.price = -1
     }
 
-    // Nếu không có bộ lọc giá, lấy tất cả sản phẩm theo category (nếu có)
-    const products = await productModel.find(query)
+    const skip = (page - 1) * limit
+
+    const [products, total] = await Promise.all([
+      productModel.find(query).sort(sort).skip(skip).limit(limit),
+      productModel.countDocuments(query)
+    ])
+
     if (!products || products.length === 0) {
       return new OkResponse('No products found with the specified filters', [])
     }
 
-    return new OkResponse('Get products successfully', products)
+    return new OkResponse('Get products successfully', {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+      data: products
+    })
   }
 
   async getProductById(id: string) {
     const product = await productModel.findById(id)
-    if (!product) throw new Error('Sản phẩm không tồn tại')
+    if (!product) throw new BadRequestError('Sản phẩm không tồn tại')
     return new OkResponse('Get product successfully', product)
   }
 
@@ -78,6 +85,20 @@ class ProductService {
 
     if (!updatedProduct) throw new BadRequestError('Sản phẩm không tồn tại')
     return new OkResponse('Cập nhật sản phẩm thành công', updatedProduct)
+  }
+
+  async searchProduct(code: string) {
+    const products = await productModel
+      .find({
+        code: { $regex: code, $options: 'i' }
+      })
+      .limit(5)
+    return new OkResponse('Tìm kiếm sản phẩm thành công', products)
+  }
+
+  async deleteManyProduct() {
+    const products = await productModel.deleteMany()
+    return new OkResponse('Xóa sản phẩm thành công', products)
   }
 }
 

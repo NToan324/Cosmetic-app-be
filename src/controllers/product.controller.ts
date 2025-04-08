@@ -10,9 +10,29 @@ class ProductController {
   }
 
   async getProducts(req: Request, res: Response) {
-    const { category, price } = req.query as { category: string; price: string }
-    console.log(category, price)
-    res.send(await productService.getProducts({ category, price }))
+    const {
+      category,
+      price,
+      page = '1',
+      limit = '10'
+    } = req.query as {
+      category?: string
+      price?: string
+      page?: string
+      limit?: string
+    }
+
+    const pageNumber = parseInt(page, 10)
+    const limitNumber = parseInt(limit, 10)
+
+    res.send(
+      await productService.getProducts({
+        category,
+        price,
+        page: pageNumber,
+        limit: limitNumber
+      })
+    )
   }
 
   async getProductById(req: Request, res: Response) {
@@ -30,6 +50,15 @@ class ProductController {
     const productId = req.params.id
     const payload = req.body
     res.send(await productService.updateProduct({ payload, id, productId }))
+  }
+
+  async searchProduct(req: Request, res: Response) {
+    const { code } = req.query as { code: string }
+    res.send(await productService.searchProduct(code))
+  }
+
+  async deleteManyProduct(req: Request, res: Response) {
+    res.send(await productService.deleteManyProduct())
   }
 }
 

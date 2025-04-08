@@ -18,6 +18,7 @@ export class ProductValidation {
           units: z.enum(['BOX', 'TUBE', 'PACK', 'PCS'], {
             errorMap: () => ({ message: 'Đơn vị không hợp lệ' })
           }),
+          code: z.string().nonempty('Mã sản phẩm không được để trống'),
           category_id: z.string().nonempty('Mã loại sản phẩm không được để trống'),
           brand_id: z.string().nonempty('Mã hiệu sản phẩm không được để trống'),
           image_url: z.string().optional(),
@@ -76,6 +77,8 @@ export class ProductValidation {
             .int('Số lượng tồn kho phải là số nguyên')
             .positive('Số lượng tồn kho phải là số dương')
             .optional(),
+          code: z.string().nonempty('Mã sản phẩm không được để trống'),
+
           units: z
             .enum(['BOX', 'TUBE', 'PACK', 'PCS'], {
               errorMap: () => ({ message: 'Đơn vị không hợp lệ' })
