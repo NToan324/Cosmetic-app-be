@@ -8,6 +8,7 @@ import { Router } from 'express'
 const router = Router()
 
 router.get('/', asyncHandler(productController.getProducts))
+router.get('/search', asyncHandler(productController.searchProduct))
 router.get('/:id', asyncHandler(productController.getProductById))
 router.post(
   '/',
@@ -21,6 +22,6 @@ router.put(
   validationRequest(ProductValidation.updateProduct()),
   asyncHandler(productController.updateProduct)
 )
+router.delete('/', verifyJWT, asyncHandler(productController.deleteManyProduct))
 router.delete('/:id', verifyJWT, asyncHandler(productController.deleteProduct))
-
 export default router
