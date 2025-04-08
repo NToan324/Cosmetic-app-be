@@ -40,12 +40,11 @@ export class EmployeeValidation {
     }
   }
 
-  static deleteEmployee() {
-    return {
-      body: z.object({
-        userId: z.string().refine((val) => isValidObjectId(val), 'ID không hợp lệ'),
-        reason: z.string().nonempty('Lý do không được để trống')
-      })
-    }
-  }
+  // static deleteEmployee() {
+  //   return {
+  //     body: z.object({
+  //       reason: z.string().nonempty('Lý do không được để trống')
+  //     })
+  //   }
+  // }
 }
