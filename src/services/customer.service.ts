@@ -28,25 +28,20 @@ class UserService {
   }
 
   async getCustomer(id: string) {
-    const customer = await userModel.aggregate([
-      {
-        $match: { _id: convertToObjectId(id) }
-      },
-      {
-        $lookup: {
-          from: 'customers',
-          localField: '_id',
-          foreignField: 'userId',
-          as: 'customerDetails'
-        }
-      },
-      {
-        $project: {
-          password: 0,
-          'customerDetails.userId': 0
-        }
+    const user = await userModel.findById(id).select('-password')
+    if (!user) {
+      throw new BadRequestError('User not found')
+    }
+    const customerDetails = await customerModel.findOne({ userId: user._id })
+    if (!customerDetails) {
+      throw new BadRequestError('Customer not found')
+    }
+    const customer = {
+      ...user.toObject(),
+      customerDetails: {
+        ...customerDetails.toObject()
       }
-    ])
+    }
     return new OkResponse('Get user successfully', customer)
   }
 
@@ -57,6 +52,32 @@ class UserService {
     }
     await Promise.all([userModel.findByIdAndDelete(id), customerModel.findOneAndDelete({ userId: id })])
     return new OkResponse('Delete user successfully', id)
+  }
+
+  async searchCustomer(phone: string) {
+    const user = await userModel
+      .findOne({
+        phone: { $regex: phone, $options: 'i' }
+      })
+      .select('-password')
+      .limit(1)
+    if (user) {
+      console.log('user', user)
+      const customer = await customerModel.findOne({
+        userId: user._id
+      })
+      if (!customer) {
+        return new OkResponse('Customer not found', [])
+      }
+      const customerDetails = {
+        ...user.toObject(),
+        customerDetails: {
+          ...customer.toObject()
+        }
+      }
+      return new OkResponse('Get customer successfully', customerDetails)
+    }
+    return new OkResponse('User not found', [])
   }
 }
 const userService = new UserService()

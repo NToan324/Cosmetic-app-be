@@ -15,6 +15,11 @@ class UserController {
     const id = req.params.id
     res.send(await userService.getCustomer(id))
   }
+
+  async searchCustomer(req: Request, res: Response) {
+    const { phone } = req.query as { phone: string }
+    res.send(await userService.searchCustomer(phone))
+  }
 }
 const userController = new UserController()
 export default userController

@@ -41,6 +41,27 @@ class AuthController {
     const { phone, email } = req.user as { phone?: string; email?: string }
     res.send(await authService.getMe({ phone, email }))
   }
+
+  async getOtp(req: Request, res: Response) {
+    res.send(await authService.getOtp())
+  }
+
+  async forgotPassword(req: Request, res: Response) {
+    const payload = req.body
+    res.send(await authService.forgotPassword(payload))
+  }
+
+  async verifyOtp(req: Request, res: Response) {
+    const { otp_code } = req.body
+    const { id } = req.query as { id: string }
+    res.send(await authService.verifyOtp({ otp_code, id }))
+  }
+
+  async resetPassword(req: Request, res: Response) {
+    const { password } = req.body
+    const { id } = req.query as { id: string }
+    res.send(await authService.resetPassword({ password, id }))
+  }
 }
 const authController = new AuthController()
 export default authController

@@ -2,6 +2,8 @@ import { BadRequestError } from '@/core/error.response'
 import { CreatedResponse, OkResponse } from '@/core/success.response'
 import userModel from '@/models/user.model'
 import customerModel, { Customer } from '@/models/customer.model'
+import employeeModel from '@/models/employee.model'
+import otpModel from '@/models/otp.model'
 import bcrypt from 'bcrypt'
 import jwt, { JwtPayload } from 'jsonwebtoken'
 import dotenv from 'dotenv'
@@ -151,6 +153,117 @@ class AuthService {
     } catch (err) {
       throw new BadRequestError('Invalid token')
     }
+  }
+
+  async getOtp() {
+    const otp = await otpModel.find({}).sort({ createdAt: -1 })
+    if (!otp) {
+      throw new BadRequestError('OTP not found')
+    }
+    return new OkResponse('Get OTP successfully', otp)
+  }
+
+  async forgotPassword(payload: { phone?: string; email?: string }) {
+    const { phone, email } = payload
+
+    let findUser
+
+    if (phone && !email) {
+      findUser = await userModel.findOne({ phone })
+      if (!findUser) throw new BadRequestError('User not found')
+
+      const findCustomer = await customerModel.findOne({ userId: findUser._id })
+      if (!findCustomer) throw new BadRequestError('Customer not found')
+    } else if (email) {
+      findUser = await userModel.findOne({ email })
+      if (!findUser) throw new BadRequestError('User not found')
+
+      const findEmployee = await employeeModel.findOne({ userId: findUser._id })
+      if (!findEmployee) throw new BadRequestError('Employee not found')
+    } else {
+      throw new BadRequestError('Phone or Email is required')
+    }
+
+    const otp = await otpModel.create({
+      user_id: findUser._id,
+      otp_code: '654321',
+      expiration: new Date(Date.now() + 10 * 60 * 1000),
+      is_verified: false
+    })
+
+    return new OkResponse('Get OTP successfully', otp)
+  }
+
+  async verifyOtp({ otp_code, id }: { otp_code: string; id: string }) {
+    const user = await userModel.findOne({
+      _id: id
+    })
+
+    if (!user) {
+      throw new BadRequestError('User not found')
+    }
+
+    // Tìm OTP theo user_id và otp_code, sắp xếp theo thời gian tạo mới nhất
+    const otpRecord = await otpModel
+      .findOne({
+        user_id: user._id,
+        otp_code
+      })
+      .sort({ created_at: -1 })
+
+    if (!otpRecord) {
+      throw new BadRequestError('OTP code is not valid')
+    }
+
+    if (otpRecord.expiration < new Date()) {
+      throw new BadRequestError('OTP code is expired')
+    }
+
+    if (otpRecord.is_verified) {
+      throw new BadRequestError('OTP code is already verified')
+    }
+
+    // Cập nhật trạng thái is_verified
+    otpRecord.is_verified = true
+    await otpRecord.save()
+
+    return new OkResponse('Verify OTP successfully', otpRecord)
+  }
+
+  async resetPassword({ password, id }: { password: string; id: string }) {
+    const user = await userModel.findOne({
+      _id: id
+    })
+
+    if (!user) {
+      throw new BadRequestError('User not found')
+    }
+
+    // Kiểm tra OTP đã được xác thực hay chưa
+    const otp = await otpModel.findOne({
+      user_id: user._id,
+      is_verified: true,
+      expiration: { $gt: new Date() }
+    })
+
+    if (!otp) {
+      throw new BadRequestError('OTP is not verified or expired')
+    }
+
+    //check if password is old password
+    const isPasswordMatch = await bcrypt.compare(password, user.password)
+    if (isPasswordMatch) {
+      throw new BadRequestError('New password must be different from old password')
+    }
+
+    // Cập nhật mật khẩu
+    user.password = password
+    await user.save()
+
+    // Xoá OTP sau khi đổi mật khẩu (tuỳ ý)
+    await otpModel.deleteMany({ user_id: user._id })
+
+    return new OkResponse('Password has been reset successfully')
   }
 }
 
