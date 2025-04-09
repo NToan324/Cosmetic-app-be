@@ -3,6 +3,7 @@ const otpSchema = new Schema(
   {
     user_id: {
       type: mongoose.Schema.Types.ObjectId,
+      ref: 'user',
       required: true
     },
     otp_code: {
@@ -12,10 +13,6 @@ const otpSchema = new Schema(
     expiration: {
       type: Date,
       required: true
-    },
-    created_at: {
-      type: Date,
-      default: Date.now
     },
     is_verified: {
       type: Boolean,

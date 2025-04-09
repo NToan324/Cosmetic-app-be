@@ -27,4 +27,35 @@ export class AuthValidation {
         })
     }
   }
+
+  static forgotPasswordSchema() {
+    return {
+      body: z.object({
+        phone: z.string().min(10, 'Phone number must be at least 10 characters long').optional(),
+        email: z.string().email('Email is not valid').optional()
+      })
+    }
+  }
+
+  static verifyOtp() {
+    return {
+      body: z.object({
+        otp_code: z.string().nonempty('OTP code is required')
+      }),
+      query: z.object({
+        id: z.string().nonempty('User ID is required')
+      })
+    }
+  }
+
+  static resetPassword() {
+    return {
+      body: z.object({
+        password: z.string().nonempty('Password is required')
+      }),
+      query: z.object({
+        id: z.string().nonempty('User ID is required')
+      })
+    }
+  }
 }
