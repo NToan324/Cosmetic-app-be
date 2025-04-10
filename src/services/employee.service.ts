@@ -55,9 +55,19 @@ class EmployeeService {
 
   async getEmployeeById(id: string) {
     const employee = await EmployeeModel.findOne({ userId: convertToObjectId(id) })
-    if (!employee) throw new BadRequestError('Employee not found')
-    const user = await UserModel.findById(employee.userId).select('-password')
-    return { message: 'Get employee successfullly', employee: { ...employee.toObject(), user } }
+      .populate({
+        path: 'edit_history.edited_by',
+        select: '_id name'
+      });
+    if (!employee) throw new BadRequestError('Employee not found');
+    const user = await UserModel.findById(employee.userId).select('-password');
+    return { 
+      message: 'Get employee successfully', 
+      employee: { 
+        ...employee.toObject(), 
+        user 
+      } 
+    };
   }
 
   async createEmployee({ payload, id }: { payload: EmployeeCreateData; id: string }) {
