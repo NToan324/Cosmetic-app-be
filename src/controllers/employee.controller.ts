@@ -3,7 +3,9 @@ import employeeService from '@/services/employee.service'
 
 class EmployeeController {
   async getAllEmployees(req: Request, res: Response) {
-    res.send(await employeeService.getAllEmployees())
+    const page = parseInt(req.query.page as string) || 1
+    const limit = parseInt(req.query.limit as string) || 10
+    res.send(await employeeService.getAllEmployees(page, limit))
   }
 
   async getEmployeeById(req: Request, res: Response) {

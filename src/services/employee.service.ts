@@ -1,9 +1,9 @@
 import UserModel, { User } from '@/models/user.model'
 import EmployeeModel, { Employee } from '@/models/employee.model'
-import mongoose from 'mongoose'
 import { convertToObjectId } from '@/helpers/convertObjectId'
 import { CreatedResponse, OkResponse } from '@/core/success.response'
 import { BadRequestError } from '@/core/error.response'
+import emailConfig from '@/config/email'
 
 interface EmployeeCreateData {
   name: string
@@ -35,22 +35,31 @@ interface EmployeeDeleteData {
 }
 
 class EmployeeService {
-  async getAllEmployees() {
-    const employees = await EmployeeModel.find()
-    const user = await UserModel.find({ _id: { $in: employees.map((employee) => employee.userId) } }).select(
-      '-password'
-    )
+  async getAllEmployees(page = 1, limit = 10) {
+    const skip = (page - 1) * limit
 
-    return new OkResponse(
-      'Get all employees successfully',
-      employees.map((employee) => {
-        const userData = user.find((user) => user._id.toString() === employee.userId.toString())
-        return {
-          ...employee.toObject(),
-          user: userData
-        }
-      })
-    )
+    const [total, employees] = await Promise.all([
+      EmployeeModel.countDocuments(),
+      EmployeeModel.find().skip(skip).limit(limit)
+    ])
+
+    const users = await UserModel.find({ _id: { $in: employees.map((e) => e.userId) } }).select('-password')
+
+    const data = employees.map((employee) => {
+      const userData = users.find((u) => u._id.toString() === employee.userId.toString())
+      return {
+        ...employee.toObject(),
+        user: userData
+      }
+    })
+
+    return new OkResponse('Get all employees successfully', {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+      data: data
+    })
   }
 
   async getEmployeeById(id: string) {
@@ -68,14 +77,23 @@ class EmployeeService {
       throw new Error(existingUser.email === email ? 'Email is existed' : 'Phone is existed')
     }
     let password = email.split('@')[0]
-
+    //send email to user
+    const emailOptions = emailConfig.createAccountMailOptions({
+      email: email,
+      name: name,
+      password: password
+    })
+    const sendEmail = await emailConfig.transporter.sendMail(emailOptions)
+    if (!sendEmail) {
+      throw new BadRequestError('Error sending email')
+    }
     //Create first employee in db
     const firstEmployee = (await EmployeeModel.countDocuments()) === 0
     const user = await UserModel.create({
       name,
       phone,
       email,
-      active: true,
+      active: firstEmployee ? true : false,
       role: firstEmployee ? ['MANAGER'] : role,
       password: password
     })

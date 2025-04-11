@@ -8,7 +8,11 @@ class UserController {
   }
 
   async getCustomers(req: Request, res: Response) {
-    res.send(await userService.getCustomers())
+    const page = parseInt(req.query.page as string) || 1
+    const limit = parseInt(req.query.limit as string) || 10
+
+    const response = await userService.getCustomers(page, limit)
+    res.send(response)
   }
 
   async getCustomer(req: Request, res: Response) {
