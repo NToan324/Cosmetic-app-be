@@ -1,4 +1,4 @@
-import { BadRequestError } from '@/core/error.response'
+import { BadRequestError, ForbiddenError } from '@/core/error.response'
 import { CreatedResponse, OkResponse } from '@/core/success.response'
 import userModel from '@/models/user.model'
 import customerModel, { Customer } from '@/models/customer.model'
@@ -7,6 +7,7 @@ import otpModel from '@/models/otp.model'
 import bcrypt from 'bcrypt'
 import jwt, { JwtPayload } from 'jsonwebtoken'
 import dotenv from 'dotenv'
+import emailConfig from '@/config/email'
 dotenv.config()
 class AuthService {
   async signup(payload: { phone: string; name: string }) {
@@ -44,20 +45,35 @@ class AuthService {
 
   async login(data: { email: string; phone: string; password: string }) {
     const { email, phone, password } = data
-    const userFound = await userModel.findOne({ $or: [{ email }, { phone }] })
-    if (!userFound) {
+    const foundUser = await userModel.findOne(email ? { email } : { phone })
+    if (!foundUser) {
       throw new BadRequestError('User not found')
     }
-    const isPasswordMatch = await bcrypt.compare(password, userFound.password)
+    if (phone && !email) {
+      const isCustomer = await customerModel.findOne({ userId: foundUser._id })
+      if (!isCustomer) {
+        throw new BadRequestError('Customer not found')
+      }
+    } else if (email) {
+      const isEmployee = await employeeModel.findOne({ userId: foundUser._id })
+      if (!isEmployee) {
+        throw new BadRequestError('Employee not found')
+      }
+    }
+    const isPasswordMatch = await bcrypt.compare(password, foundUser.password)
     if (!isPasswordMatch) {
       throw new BadRequestError('Password is incorrect')
     }
+    //check if user is active
+    if (!foundUser.active) {
+      throw new ForbiddenError('UnverifiedAccount')
+    }
     const accessToken = jwt.sign(
       {
-        id: userFound._id,
-        phone: userFound.phone || undefined,
-        email: userFound.email || undefined,
-        role: userFound.role
+        id: foundUser._id,
+        phone: foundUser.phone || undefined,
+        email: foundUser.email || undefined,
+        role: foundUser.role
       },
       process.env.ACCESS_TOKEN_SECRETE as string,
       {
@@ -66,10 +82,10 @@ class AuthService {
     )
     const refreshToken = jwt.sign(
       {
-        id: userFound._id,
-        phone: userFound.phone || undefined,
-        email: userFound.email || undefined,
-        role: userFound.role
+        id: foundUser._id,
+        phone: foundUser.phone || undefined,
+        email: foundUser.email || undefined,
+        role: foundUser.role
       },
       process.env.REFRESH_TOKEN_SECRETE as string,
       {
@@ -77,7 +93,7 @@ class AuthService {
       }
     )
 
-    const customer = await customerModel.findOne({ userId: userFound._id })
+    const customer = await customerModel.findOne({ userId: foundUser._id })
     let rank
     let point
     if (customer) {
@@ -86,10 +102,10 @@ class AuthService {
     }
 
     const user = {
-      id: userFound._id,
-      phone: userFound.phone,
-      name: userFound.name,
-      role: userFound.role,
+      id: foundUser._id,
+      phone: foundUser.phone,
+      name: foundUser.name,
+      role: foundUser.role,
       rank: rank,
       point: point
     }
@@ -131,6 +147,17 @@ class AuthService {
       point: point
     }
     return new OkResponse('Get user successfully', userResponse)
+  }
+
+  async getUserByPhoneOrEmail({ phone, email }: { phone?: string; email?: string }) {
+    if (!phone && !email) {
+      throw new BadRequestError('Phone or email is required')
+    }
+    const user = await userModel.findOne({ $or: [{ phone }, { email }] }).select('-password')
+    if (!user) {
+      throw new BadRequestError('The account has not been registered')
+    }
+    return new OkResponse('Found user successfully', user)
   }
 
   refreshToken(token: string) {
@@ -184,9 +211,20 @@ class AuthService {
       throw new BadRequestError('Phone or Email is required')
     }
 
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString()
+
+    //send email
+    if (email) {
+      const mailOptions = emailConfig.mailOptions({ email, otpCode })
+      const sendMail = await emailConfig.transporter.sendMail(mailOptions)
+      if (!sendMail) {
+        throw new BadRequestError('Error sending email')
+      }
+    }
+
     const otp = await otpModel.create({
       user_id: findUser._id,
-      otp_code: '654321',
+      otp_code: otpCode,
       expiration: new Date(Date.now() + 10 * 60 * 1000),
       is_verified: false
     })
@@ -223,8 +261,9 @@ class AuthService {
       throw new BadRequestError('OTP code is already verified')
     }
 
-    // Cập nhật trạng thái is_verified
     otpRecord.is_verified = true
+    user.active = true
+    await user.save()
     await otpRecord.save()
 
     return new OkResponse('Verify OTP successfully', otpRecord)
@@ -264,6 +303,45 @@ class AuthService {
     await otpModel.deleteMany({ user_id: user._id })
 
     return new OkResponse('Password has been reset successfully')
+  }
+
+  async resendOtp(id: string) {
+    const user = await userModel.findById(id)
+    if (!user) {
+      throw new BadRequestError('User not found')
+    }
+    const checkOtp = await otpModel.updateMany(
+      {
+        user_id: user._id,
+        is_verified: false
+      },
+      {
+        $set: {
+          expiration: new Date(Date.now())
+        }
+      }
+    )
+
+    if (!checkOtp) {
+      throw new BadRequestError('OTP not found')
+    }
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString()
+    const otp = await otpModel.create({
+      user_id: user._id,
+      otp_code: otpCode,
+      expiration: new Date(Date.now() + 10 * 60 * 1000),
+      is_verified: false
+    })
+    //check user is employee
+    if (user.email) {
+      const email = user.email
+      const mailOptions = emailConfig.mailOptions({ email, otpCode })
+      const sendMail = await emailConfig.transporter.sendMail(mailOptions)
+      if (!sendMail) {
+        throw new BadRequestError('Error sending email')
+      }
+    }
+    return new OkResponse('Resend OTP successfully', otp)
   }
 }
 

@@ -42,6 +42,12 @@ class AuthController {
     res.send(await authService.getMe({ phone, email }))
   }
 
+  async getUserByPhoneOrEmail(req: Request, res: Response) {
+    const email = req.query.email as string
+    const phone = req.query.phone as string
+    res.send(await authService.getUserByPhoneOrEmail({ email, phone }))
+  }
+
   async getOtp(req: Request, res: Response) {
     res.send(await authService.getOtp())
   }
@@ -49,6 +55,11 @@ class AuthController {
   async forgotPassword(req: Request, res: Response) {
     const payload = req.body
     res.send(await authService.forgotPassword(payload))
+  }
+
+  async resendOtp(req:Request, res: Response) {
+    const { id } = req.body
+    res.send(await authService.resendOtp(id))
   }
 
   async verifyOtp(req: Request, res: Response) {

@@ -5,7 +5,9 @@ import { convertToObjectId } from '@/helpers/convertObjectId'
 import { BadRequestError } from '@/core/error.response'
 
 class UserService {
-  async getCustomers() {
+  async getCustomers(page = 1, limit = 10) {
+    const skip = (page - 1) * limit
+
     const customers = await userModel.aggregate([
       {
         $lookup: {
@@ -22,9 +24,37 @@ class UserService {
         $project: {
           password: 0
         }
+      },
+      { $skip: skip },
+      { $limit: limit }
+    ])
+
+    const totalResult = await userModel.aggregate([
+      {
+        $lookup: {
+          from: 'customers',
+          localField: '_id',
+          foreignField: 'userId',
+          as: 'customer'
+        }
+      },
+      {
+        $unwind: '$customer'
+      },
+      {
+        $count: 'total'
       }
     ])
-    return new OkResponse('Get all users successfully', customers)
+
+    const total = totalResult[0]?.total || 0
+
+    return new OkResponse('Get customers successfully', {
+      data: customers,
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit)
+    })
   }
 
   async getCustomer(id: string) {
@@ -67,7 +97,7 @@ class UserService {
         userId: user._id
       })
       if (!customer) {
-        return new OkResponse('Customer not found', [])
+        throw new BadRequestError('Customer not found')
       }
       const customerDetails = {
         ...user.toObject(),
@@ -77,7 +107,7 @@ class UserService {
       }
       return new OkResponse('Get customer successfully', customerDetails)
     }
-    return new OkResponse('User not found', [])
+    return new OkResponse('New customer', {})
   }
 }
 const userService = new UserService()
