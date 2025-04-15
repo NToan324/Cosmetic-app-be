@@ -32,7 +32,7 @@ class EmailConfig {
             ${otpCode}
           </div>
           <p style="color: #777; text-align: center;">
-            Mã này sẽ hết hạn sau 5 phút. Vui lòng không chia sẻ cho bất kỳ ai.
+            Mã này sẽ hết hạn sau 2 phút. Vui lòng không chia sẻ cho bất kỳ ai.
           </p>
           <hr style="border: 0; height: 1px; background: #ddd; margin: 20px 0;" />
           <p style="color: #aaa; font-size: 12px; text-align: center;">
@@ -44,15 +44,7 @@ class EmailConfig {
   }
 
   // Gửi thông báo tài khoản nhân viên được tạo thành công
-  createAccountMailOptions = ({
-    email,
-    name,
-    password
-  }: {
-    email: string
-    name: string
-    password: string
-  }) => {
+  createAccountMailOptions = ({ email, name, password }: { email: string; name: string; password: string }) => {
     return {
       from: 'nhattoan664t@gmail.com',
       to: email,

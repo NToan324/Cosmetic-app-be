@@ -36,3 +36,10 @@ export enum Unit {
   PACK = 'PACK',
   PCS = 'PCS'
 }
+
+export enum OrderStatus {
+  PENDING = 'PENDING',
+  PROCESSING = 'PROCESSING',
+  CANCELLED = 'CANCELLED'
+  
+}

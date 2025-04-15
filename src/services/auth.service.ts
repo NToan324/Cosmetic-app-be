@@ -225,7 +225,7 @@ class AuthService {
     const otp = await otpModel.create({
       user_id: findUser._id,
       otp_code: otpCode,
-      expiration: new Date(Date.now() + 10 * 60 * 1000),
+      expiration: new Date(Date.now() + 2 * 60 * 1000),
       is_verified: false
     })
 

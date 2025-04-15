@@ -1,5 +1,6 @@
 import { BadRequestError } from '@/core/error.response'
 import { OkResponse } from '@/core/success.response'
+import { convertToObjectId } from '@/helpers/convertObjectId'
 import shiftModel from '@/models/shift.model'
 
 class ShiftService {
@@ -26,6 +27,11 @@ class ShiftService {
   }
 
   async createShift({ id, opening_cash }: { id: string; opening_cash: number }) {
+    //check if shift is already opened
+    const existingShift = await shiftModel.findOne({ employee_id: convertToObjectId(id), is_closed: false })
+    if (existingShift) {
+      throw new BadRequestError('Ca làm đang được mở, không thể mở ca mới')
+    }
     const shift = await shiftModel.create({
       employee_id: id,
       opening_cash,
