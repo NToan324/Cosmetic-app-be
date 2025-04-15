@@ -77,7 +77,7 @@ class AuthService {
       },
       process.env.ACCESS_TOKEN_SECRETE as string,
       {
-        expiresIn: '1h'
+        expiresIn: '1d'
       }
     )
     const refreshToken = jwt.sign(
@@ -89,7 +89,7 @@ class AuthService {
       },
       process.env.REFRESH_TOKEN_SECRETE as string,
       {
-        expiresIn: '1d'
+        expiresIn: '10d'
       }
     )
 
@@ -225,7 +225,7 @@ class AuthService {
     const otp = await otpModel.create({
       user_id: findUser._id,
       otp_code: otpCode,
-      expiration: new Date(Date.now() + 10 * 60 * 1000),
+      expiration: new Date(Date.now() + 2 * 60 * 1000),
       is_verified: false
     })
 

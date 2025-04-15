@@ -40,4 +40,3 @@ const customerModel = mongoose.model('customer', customerSchema)
 export type Customer = InferSchemaType<typeof customerSchema>
 
 export default customerModel
-

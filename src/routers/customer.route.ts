@@ -8,6 +8,7 @@ import verifyJWT from '@/middleware/verifyJWT'
 const router = express.Router()
 
 router.get('/', verifyJWT, asyncHandler(customerController.getAllCustomers))
+router.get('/search', asyncHandler(customerController.searchCustomer))
 router.get('/:id', verifyJWT, asyncHandler(customerController.getCustomerById))
 router.post(
   '/',
@@ -22,5 +23,4 @@ router.patch(
   asyncHandler(customerController.updateCustomer)
 )
 router.delete('/:id', verifyJWT, asyncHandler(customerController.deleteCustomer))
-router.get('/search', asyncHandler(customerController.searchCustomer))
 export default router
