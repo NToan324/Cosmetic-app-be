@@ -1,12 +1,26 @@
-import userController from '@/controllers/customer.controller'
+import express from 'express'
+import customerController from '@/controllers/customer.controller'
 import asyncHandler from '@/middleware/asyncHandler'
+import { CustomerValidation } from '@/validation/customer.validation'
+import { validationRequest } from '@/middleware/validationRequest'
 import verifyJWT from '@/middleware/verifyJWT'
-import { Router } from 'express'
-const router = Router()
 
-router.delete('/:id', asyncHandler(userController.deleteCustomer))
-router.get('/', verifyJWT, asyncHandler(userController.getCustomers))
-router.get('/search', asyncHandler(userController.searchCustomer))
-router.get('/:id', asyncHandler(userController.getCustomer))
+const router = express.Router()
 
+router.get('/', verifyJWT, asyncHandler(customerController.getAllCustomers))
+router.get('/:id', verifyJWT, asyncHandler(customerController.getCustomerById))
+router.post(
+  '/',
+  verifyJWT,
+  validationRequest(CustomerValidation.createCustomer()),
+  asyncHandler(customerController.createCustomer)
+)
+router.patch(
+  '/:id',
+  verifyJWT,
+  validationRequest(CustomerValidation.updateCustomer()),
+  asyncHandler(customerController.updateCustomer)
+)
+router.delete('/:id', verifyJWT, asyncHandler(customerController.deleteCustomer))
+router.get('/search', asyncHandler(customerController.searchCustomer))
 export default router

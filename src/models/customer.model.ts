@@ -1,28 +1,37 @@
 import mongoose, { InferSchemaType, Schema } from 'mongoose'
+
 const customerSchema = new Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
-      unique: true
+      unique: true,
+      ref: 'user'
     },
     rank: {
       type: String,
-      enum: ['MEMBER', 'BRONZE', 'SILVER', 'GOLD', 'DIAMOND', 'PLATINUM']
+      enum: ['MEMBER', 'BRONZE', 'SILVER', 'GOLD', 'DIAMOND', 'PLATINUM'],
+      default: 'MEMBER'
     },
     point: {
       type: Number,
       default: 0
     },
-    skin_type: {
-      type: String
+    note: {
+      type: String,
+      default: ''
     },
-    skin_issues: {
-      type: String
+    created_by: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'user'
     },
-    age: {
-      type: Number
-    }
+    edit_history: [
+      {
+        edited_at: { type: Date, default: Date.now },
+        edited_by: { type: mongoose.Schema.Types.ObjectId, ref: 'user' },
+        reason: { type: String }
+      }
+    ]
   },
   { timestamps: true }
 )
@@ -31,3 +40,4 @@ const customerModel = mongoose.model('customer', customerSchema)
 export type Customer = InferSchemaType<typeof customerSchema>
 
 export default customerModel
+
