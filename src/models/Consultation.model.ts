@@ -19,7 +19,7 @@ const consultationSchema = new Schema(
   { timestamps: true }
 )
 
-const consultation = mongoose.model('consultation', consultationSchema)
+const consultationModel = mongoose.model('consultation', consultationSchema)
 type Consultation = InferSchemaType<typeof consultationSchema>
-export default consultation
+export default consultationModel
 export type { Consultation }

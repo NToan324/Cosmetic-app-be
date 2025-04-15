@@ -10,7 +10,7 @@ export default class ErrorHandler {
   static globalError(err: any, req: Request, res: Response, next: NextFunction) {
     const statusCode = err instanceof CustomError ? err.status : StatusCodes.INTERNAL_SERVER_ERROR
     const message = err.message || 'Internal Server Error'
-
+    console.error(err)
     res.status(statusCode).json({
       success: false,
       error: {

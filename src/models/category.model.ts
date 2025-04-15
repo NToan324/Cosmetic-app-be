@@ -13,7 +13,7 @@ const categorySchema = new Schema(
   { timestamps: true }
 )
 
-const category = mongoose.model('category', categorySchema)
+const categoryModel = mongoose.model('category', categorySchema)
 type Category = InferSchemaType<typeof categorySchema>
-export default category
+export default categoryModel
 export type { Category }

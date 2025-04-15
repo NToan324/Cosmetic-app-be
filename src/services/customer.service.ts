@@ -93,19 +93,19 @@ class UserService {
       .limit(1)
     if (user) {
       console.log('user', user)
-      const customer = await customerModel.findOne({
+      const foundCustomer = await customerModel.findOne({
         userId: user._id
       })
-      if (!customer) {
+      if (!foundCustomer) {
         throw new BadRequestError('Customer not found')
       }
-      const customerDetails = {
+      const customer = {
         ...user.toObject(),
-        customerDetails: {
-          ...customer.toObject()
+        customer: {
+          ...foundCustomer.toObject()
         }
       }
-      return new OkResponse('Get customer successfully', customerDetails)
+      return new OkResponse('Get customer successfully', customer)
     }
     return new OkResponse('New customer', {})
   }

@@ -27,7 +27,7 @@ const customerSchema = new Schema(
   { timestamps: true }
 )
 
-const customer = mongoose.model('customer', customerSchema)
+const customerModel = mongoose.model('customer', customerSchema)
 export type Customer = InferSchemaType<typeof customerSchema>
 
-export default customer
+export default customerModel

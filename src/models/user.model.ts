@@ -43,8 +43,8 @@ userSchema.pre('save', async function (next) {
   next()
 })
 
-const user = mongoose.model('user', userSchema)
+const userModel = mongoose.model('user', userSchema)
 type User = InferSchemaType<typeof userSchema>
 
-export default user
+export default userModel
 export type { User }

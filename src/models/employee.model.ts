@@ -48,6 +48,6 @@ const employeeSchema = new Schema(
   { timestamps: true }
 )
 
-const EmployeeModel = mongoose.model('employee', employeeSchema)
+const employeeModel = mongoose.model('employee', employeeSchema)
 export type Employee = InferSchemaType<typeof employeeSchema>
-export default EmployeeModel
+export default employeeModel

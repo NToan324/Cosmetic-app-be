@@ -3,7 +3,13 @@ const orderSchema = new Schema(
   {
     user_id: {
       type: mongoose.Schema.Types.ObjectId,
-      required: true
+      ref: 'user',
+      default: null
+    },
+    order_id: {
+      type: String,
+      required: true,
+      unique: true
     },
     items: [
       {
@@ -16,10 +22,15 @@ const orderSchema = new Schema(
           required: true
         },
         price: {
-          type: Number
+          type: Number,
+          required: true
         }
       }
     ],
+    discount_point: {
+      type: Number,
+      default: 0
+    },
     status: {
       type: String,
       enum: ['Pending', 'Awaiting Payment', 'Completed', 'Canceled'],
@@ -32,7 +43,7 @@ const orderSchema = new Schema(
   },
   { timestamps: true }
 )
-const order = mongoose.model('orders', orderSchema)
+const orderModel = mongoose.model('orders', orderSchema)
 type Order = InferSchemaType<typeof orderSchema>
-export default order
+export default orderModel
 export type { Order }
