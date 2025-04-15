@@ -77,7 +77,7 @@ class AuthService {
       },
       process.env.ACCESS_TOKEN_SECRETE as string,
       {
-        expiresIn: '1h'
+        expiresIn: '1d'
       }
     )
     const refreshToken = jwt.sign(
@@ -89,7 +89,7 @@ class AuthService {
       },
       process.env.REFRESH_TOKEN_SECRETE as string,
       {
-        expiresIn: '1d'
+        expiresIn: '10d'
       }
     )
 

@@ -21,6 +21,10 @@ class OrderController {
     const { id } = req.params
     res.send(await orderService.getOrderById(id))
   }
+
+  async deleteAllOrder(req: Request, res: Response) {
+    res.send(await orderService.deleteAllOrder())
+  }
 }
 
 const orderController = new OrderController()
