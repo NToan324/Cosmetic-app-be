@@ -1,4 +1,4 @@
-import mongoose, { InferSchemaType, Schema } from 'mongoose';
+import mongoose, { InferSchemaType, Schema } from 'mongoose'
 
 const brandSchema = new Schema(
   {
@@ -17,9 +17,9 @@ const brandSchema = new Schema(
     }
   },
   { timestamps: true }
-);
+)
 
-const brand = mongoose.model('brand', brandSchema);
-type Brand = InferSchemaType<typeof brandSchema>;
-export default brand;
-export type { Brand };
+const brandModel = mongoose.model('brand', brandSchema)
+type Brand = InferSchemaType<typeof brandSchema>
+export default brandModel
+export type { Brand }

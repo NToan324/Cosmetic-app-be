@@ -82,7 +82,7 @@ const productSchema = new Schema(
   { timestamps: true }
 )
 
-const product = mongoose.model('product', productSchema)
+const productModel = mongoose.model('product', productSchema)
 type Product = InferSchemaType<typeof productSchema>
-export default product
+export default productModel
 export type { Product }

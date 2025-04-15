@@ -13,12 +13,31 @@ const billSchema = new Schema(
       default: 'Cash'
     },
     isPaid: {
-      type: Boolean
+      type: Boolean,
+      default: false
+    },
+    total_amount: {
+      type: Number,
+      required: true
+    },
+    paid_at: {
+      type: Date
+    },
+    transaction_id: {
+      type: String
+    },
+    note: {
+      type: String
+    },
+    created_by: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'user'
     }
   },
   { timestamps: true }
 )
-const bill = mongoose.model('bills', billSchema)
+
+const billModel = mongoose.model('bills', billSchema)
 type Bill = InferSchemaType<typeof billSchema>
-export default bill
+export default billModel
 export type { Bill }

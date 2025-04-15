@@ -22,7 +22,7 @@ const otpSchema = new Schema(
   { timestamps: true }
 )
 
-const otp = mongoose.model('otp', otpSchema)
+const otpModel = mongoose.model('otp', otpSchema)
 type Otp = InferSchemaType<typeof otpSchema>
-export default otp
+export default otpModel
 export type { Otp }
