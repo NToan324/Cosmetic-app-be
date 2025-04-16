@@ -142,7 +142,17 @@ class OrderService {
         status: 'Awaiting Payment',
         total_price: totalPrice
       })
-      return new CreatedResponse('Create order successfully', newOrder)
+      const bill = await billModel.create({
+        order_id: newOrder._id,
+        isPaid: false,
+        total_amount: totalPrice,
+        created_by: createdBy || null,
+        payment_method: paymentMethod || 'Cash'
+      })
+      return new CreatedResponse('Create order successfully', {
+        order: newOrder,
+        bill
+      })
     }
 
     // Nếu có khách hàng (đặt đơn với tài khoản)
@@ -299,16 +309,50 @@ class OrderService {
     return new OkResponse('OK', infomation)
   }
 
-  async updateOrder(payload: { createdBy: string; paymentMethod: string; total_amount: number }, orderId: string) {
-    const { createdBy, paymentMethod, total_amount } = payload
-
+  async updateOrder(
+    payload: { createdBy: string; paymentMethod: string; total_amount: number; status: string },
+    orderId: string
+  ) {
+    const { createdBy, paymentMethod, total_amount, status } = payload
     const foundOrder = await orderModel.findOne({ order_id: orderId })
+
     if (!foundOrder) {
       throw new BadRequestError('Order not found')
     }
 
     if (foundOrder.status === 'Completed') {
       throw new BadRequestError('Order already completed')
+    }
+
+    if (status === 'Canceled') {
+      foundOrder.status = 'Canceled'
+      //Cộng lại số lượng sản phẩm
+      for (const item of foundOrder.items) {
+        const product = await productModel.findById(item.product_id)
+        if (!product) {
+          throw new BadRequestError('Product not found')
+        }
+        product.stock_quantity += item.quantity
+        await product.save()
+      }
+      await foundOrder.save()
+
+      //Update bill
+      const foundBill = await billModel.findOne({ order_id: foundOrder._id })
+      if (foundBill) {
+        foundBill.isPaid = false
+        foundBill.total_amount = 0
+        foundBill.paid_at = null
+        if (paymentMethod === 'Cash' || paymentMethod === 'VNPay') {
+          foundBill.payment_method = paymentMethod
+        } else {
+          throw new BadRequestError('Invalid payment method')
+        }
+        await foundBill.save()
+      }
+      return new CreatedResponse('Đơn hàng đã bị hủy', {
+        order: foundOrder
+      })
     }
 
     // Cập nhật đơn hàng
@@ -373,15 +417,20 @@ class OrderService {
       }
     }
 
-    // Tạo bill
-    const bill = await billModel.create({
-      order_id: foundOrder._id,
-      isPaid: true,
-      total_amount: total_amount,
-      paid_at: new Date(),
-      created_by: createdBy || null,
-      payment_method: paymentMethod
-    })
+    // Update bill
+    const bill = await billModel.findOne({ order_id: foundOrder._id })
+    if (!bill) {
+      throw new BadRequestError('Bill not found')
+    }
+    bill.isPaid = true
+    bill.total_amount = total_amount
+    bill.paid_at = new Date()
+    if (paymentMethod === 'Cash' || paymentMethod === 'VNPay') {
+      bill.payment_method = paymentMethod
+    } else {
+      throw new BadRequestError('Invalid payment method')
+    }
+    await bill.save()
 
     return new CreatedResponse('Cập nhật đơn hàng thành công', {
       order: foundOrder,

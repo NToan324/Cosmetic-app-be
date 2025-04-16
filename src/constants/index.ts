@@ -40,6 +40,6 @@ export enum Unit {
 export enum OrderStatus {
   PENDING = 'PENDING',
   PROCESSING = 'PROCESSING',
-  CANCELLED = 'CANCELLED'
-  
+  CANCELLED = 'CANCELLED',
+  COMPLETED = 'COMPLETED'
 }
