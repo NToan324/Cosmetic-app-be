@@ -49,7 +49,7 @@
     "typescript": "^5.8.2"
   },
   "_moduleAliases": {
-    "@": "src"
+    "@": "dist"
   },
   "_moduleDirectories": [
     "node_modules_custom"
