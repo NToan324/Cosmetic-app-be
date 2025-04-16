@@ -25,7 +25,6 @@ app.use(express.json({ limit: '50mb' }))
 app.use(express.urlencoded({ extended: true }))
 app.use(bodyParser.json({ limit: '50mb' }))
 app.use(bodyParser.urlencoded({ extended: true }))
-
 app.use(cookieParser())
 //connect database
 connectDB()

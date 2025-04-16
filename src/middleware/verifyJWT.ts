@@ -2,7 +2,6 @@ import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
 import type { Request, Response, NextFunction } from 'express'
 import { ForbiddenError, UnauthorizedError } from '@/core/error.response'
-import { User } from '@/models/user.model'
 
 dotenv.config()
 declare global {
@@ -32,7 +31,6 @@ const verifyJWT = (req: Request, res: Response, next: NextFunction) => {
     if (err) {
       return next(new ForbiddenError('Invalid token'))
     }
-
     req.user = decoded
 
     next()

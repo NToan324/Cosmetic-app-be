@@ -127,25 +127,31 @@ class AuthService {
 
   async getMe(payload: { phone?: string; email?: string }) {
     const { phone, email } = payload
-    const user = await userModel.findOne({ $or: [{ phone }, { email }] })
+
+    const conditions = []
+    if (phone) conditions.push({ phone })
+    if (email) conditions.push({ email })
+
+    if (conditions.length === 0) {
+      throw new BadRequestError('Phone or email is required')
+    }
+
+    const user = await userModel.findOne({ $or: conditions })
     if (!user) {
       throw new BadRequestError('User not found')
     }
+
     const customer = await customerModel.findOne({ userId: user._id })
-    let rank
-    let point
-    if (customer) {
-      rank = customer.rank
-      point = customer.point
-    }
+
     const userResponse = {
       id: user._id,
       phone: user.phone,
       name: user.name,
       role: user.role,
-      rank: rank,
-      point: point
+      rank: customer?.rank,
+      point: customer?.point
     }
+
     return new OkResponse('Get user successfully', userResponse)
   }
 

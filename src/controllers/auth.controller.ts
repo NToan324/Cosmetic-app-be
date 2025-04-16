@@ -57,7 +57,7 @@ class AuthController {
     res.send(await authService.forgotPassword(payload))
   }
 
-  async resendOtp(req:Request, res: Response) {
+  async resendOtp(req: Request, res: Response) {
     const { id } = req.body
     res.send(await authService.resendOtp(id))
   }
