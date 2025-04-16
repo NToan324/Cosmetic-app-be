@@ -32,18 +32,18 @@ const employeeSchema = new Schema(
         reason: { type: String }
       }
     ],
-    deleted: {
-      type: Boolean,
-      default: false
-    },
-    deleted_by: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'user'
-    },
-    deleted_at: {
-      type: Date,
-      default: Date.now
-    }
+    // deleted: {
+    //   type: Boolean,
+    //   default: false
+    // },
+    // deleted_by: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   ref: 'user'
+    // },
+    // deleted_at: {
+    //   type: Date,
+    //   default: Date.now
+    // }
   },
   { timestamps: true }
 )
