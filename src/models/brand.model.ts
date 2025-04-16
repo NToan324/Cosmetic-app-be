@@ -9,9 +9,6 @@ const brandSchema = new Schema(
     description: {
       type: String
     },
-    country: {
-      type: String
-    },
     logo_url: {
       type: String
     }
