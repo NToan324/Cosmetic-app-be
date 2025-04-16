@@ -6,7 +6,10 @@ steps:
     args: ['run', 'build']
 
   - name: 'gcr.io/cloud-builders/gcloud'
-    args: ['app', 'deploy', '--verbosity', 'debug', '--quiet', 'project', 'cosmetic-app-d1328']
+    args: ['config', 'set', 'project', 'cosmetic-app-d1328']
+
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args: ['app', 'deploy', '--verbosity', 'debug', '--quiet']
 
 options:
   logging: CLOUD_LOGGING_ONLY
