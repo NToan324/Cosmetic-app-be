@@ -54,5 +54,13 @@
   },
   "_moduleDirectories": [
     "node_modules_custom"
-  ]
+  ],
+  "pnpm": {
+    "ignoredBuiltDependencies": [
+      "bcrypt"
+    ],
+    "onlyBuiltDependencies": [
+      "bcrypt"
+    ]
+  }
 }
