@@ -6,9 +6,14 @@ class ShiftController {
     res.send(await shiftService.getAllShifts())
   }
 
-  async getShiftById(req: Request, res: Response) {
+  async getShiftOpenById(req: Request, res: Response) {
     const { id } = req.user
-    res.send(await shiftService.getShiftById(id))
+    res.send(await shiftService.getShiftOpenById(id))
+  }
+
+  async getAllShiftsById(req: Request, res: Response) {
+    const { id } = req.user
+    res.send(await shiftService.getAllShiftsById(id))
   }
 
   async checkShiftById(req: Request, res: Response) {

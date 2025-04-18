@@ -437,6 +437,45 @@ class OrderService {
       bill
     })
   }
+
+  async searchOrderByFilters(filters: { orderId?: string; customerName?: string; phone?: string }) {
+    const query: Record<string, any> = {}
+
+    // Tìm theo order_id (nếu có)
+    if (filters.orderId) {
+      query.order_id = { $regex: filters.orderId, $options: 'i' }
+    }
+
+    // Tìm theo customerName hoặc phone thông qua user
+    if (filters.customerName || filters.phone) {
+      const userQuery: Record<string, any> = {}
+
+      if (filters.customerName) {
+        userQuery.name = { $regex: filters.customerName, $options: 'i' }
+      }
+
+      if (filters.phone) {
+        userQuery.phone = { $regex: filters.phone, $options: 'i' }
+      }
+
+      const users = await userModel.find(userQuery).select('_id').lean()
+      const userIds = users.map((user) => user._id)
+
+      // Nếu không tìm thấy user nào thì trả về mảng rỗng luôn
+      if (userIds.length === 0) {
+        return new OkResponse('OK', [])
+      }
+
+      query.user_id = { $in: userIds }
+    }
+
+    const orders = await orderModel
+      .find(query)
+      .populate('user_id', 'name phone') // lấy thêm tên/sđt khách
+      .lean()
+
+    return new OkResponse('OK', orders)
+  }
 }
 
 const orderService = new OrderService()

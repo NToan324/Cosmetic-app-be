@@ -7,7 +7,8 @@ import { Router } from 'express'
 const router = Router()
 
 router.get('/', verifyJWT, asyncHandler(shiftController.getAllShifts))
-router.get('/user', verifyJWT, asyncHandler(shiftController.getShiftById))
+router.get('/open', verifyJWT, asyncHandler(shiftController.getShiftOpenById))
+router.get('/user', verifyJWT, asyncHandler(shiftController.getAllShiftsById))
 router.delete('/:id', verifyJWT, asyncHandler(shiftController.deleteShiftById))
 router.post(
   '/',

@@ -243,6 +243,8 @@ class AuthService {
       _id: id
     })
 
+    console.log('user', user)
+
     if (!user) {
       throw new BadRequestError('User not found')
     }
@@ -267,8 +269,12 @@ class AuthService {
       throw new BadRequestError('OTP code is already verified')
     }
 
+    if (user.active) {
+      console.log('active')
+      user.active = true
+    }
+
     otpRecord.is_verified = true
-    user.active = true
     await user.save()
     await otpRecord.save()
 
@@ -303,6 +309,7 @@ class AuthService {
 
     // Cập nhật mật khẩu
     user.password = password
+    user.active = true
     await user.save()
 
     // Xoá OTP sau khi đổi mật khẩu (tuỳ ý)

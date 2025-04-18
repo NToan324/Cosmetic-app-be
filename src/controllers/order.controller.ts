@@ -31,6 +31,17 @@ class OrderController {
     const payload = req.body
     res.send(await orderService.updateOrder(payload, orderId))
   }
+
+  async searchOrderByFilters(req: Request, res: Response) {
+    const { orderId, customerName, phone, orderedDate } = req.query
+    res.send(
+      await orderService.searchOrderByFilters({
+        orderId: orderId as string,
+        customerName: customerName as string,
+        phone: phone as string
+      })
+    )
+  }
 }
 
 const orderController = new OrderController()
