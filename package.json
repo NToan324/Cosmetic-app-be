@@ -20,6 +20,7 @@
     "@types/multer": "^1.4.12",
     "axios": "^1.8.4",
     "bcrypt": "^5.1.1",
+    "bcryptjs": "^3.0.2",
     "body-parser": "^2.1.0",
     "cloudinary": "^2.6.0",
     "cookie-parser": "^1.4.7",
@@ -44,7 +45,7 @@
   "devDependencies": {
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
-    "@types/node": "^22.13.10",
+    "@types/node": "^22.14.1",
     "@types/nodemailer": "^6.4.17",
     "typescript": "^5.8.3"
   },
